@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "scanner.h"
+#include "structures.h"
 
 /**
  * The function acceptToken checks whether the current token matches a target identifier,
@@ -26,12 +27,12 @@ bool acceptToken(List *lp, char *ident) {
 bool parseExecutable(List *lp) {
 
     // TODO: Determine whether to accept parsing an executable here.
-    // 
+    //
     // It is not recommended to check for existence of the executable already
     // here, since then it'll be hard to continue parsing the rest of the input
     // line (command execution should continue after a "not found" command),
     // it'll also be harder to print the correct error message.
-    // 
+    //
     // Instead, we recommend to just do a syntactical check here, which makes
     // more sense, and defer the binary existence check to the runtime part
     // you'll write later.
@@ -48,18 +49,19 @@ bool isOperator(char *s) {
     // NULL-terminated array makes it easy to expand this array later
     // without changing the code at other places.
     char *operators[] = {
-            "&",
-            "&&",
-            "||",
-            ";",
-            "<",
-            ">",
-            "|",
-            NULL
+        "&",
+        "&&",
+        "||",
+        ";",
+        "<",
+        ">",
+        "|",
+        NULL
     };
 
     for (int i = 0; operators[i] != NULL; i++) {
-        if (strcmp(s, operators[i]) == 0) return true;
+        if (strcmp(s, operators[i]) == 0)
+            return true;
     }
     return false;
 }
@@ -70,10 +72,9 @@ bool isOperator(char *s) {
  * @return a bool denoting whether the options were parsed successfully.
  */
 bool parseOptions(List *lp) {
-    //TODO: store each (*lp)->t as an option, if any exist
-    while (*lp != NULL && !isOperator((*lp)->t)) {
+    // TODO: store each (*lp)->t as an option, if any exist
+    while (*lp != NULL && !isOperator((*lp)->t))
         (*lp) = (*lp)->next;
-    }
     return true;
 }
 
@@ -99,13 +100,11 @@ bool parseCommand(List *lp) {
  * @return a bool denoting whether the pipeline was parsed successfully.
  */
 bool parsePipeline(List *lp) {
-    if (!parseCommand(lp)) {
+    if (!parseCommand(lp))
         return false;
-    }
 
-    if (acceptToken(lp, "|")) {
+    if (acceptToken(lp, "|"))
         return parsePipeline(lp);
-    }
 
     return true;
 }
@@ -116,8 +115,8 @@ bool parsePipeline(List *lp) {
  * @return a bool denoting whether the filename was parsed successfully.
  */
 bool parseFileName(List *lp) {
-    //TODO: Process the file name appropriately
-    char *fileName = (*lp)->t;
+    // TODO: Process the file name appropriately
+    //char *fileName = (*lp)->t;
     return true;
 }
 
@@ -131,18 +130,23 @@ bool parseFileName(List *lp) {
  * @return a bool denoting whether the redirections were parsed successfully.
  */
 bool parseRedirections(List *lp) {
-    if (isEmpty(*lp)) {
+    if (isEmpty(*lp))
         return true;
-    }
 
     if (acceptToken(lp, "<")) {
-        if (!parseFileName(lp)) return false;
-        if (acceptToken(lp, ">")) return parseFileName(lp);
-        else return true;
+        if (!parseFileName(lp))
+            return false;
+        if (acceptToken(lp, ">"))
+            return parseFileName(lp);
+        else
+            return true;
     } else if (acceptToken(lp, ">")) {
-        if (!parseFileName(lp)) return false;
-        if (acceptToken(lp, "<")) return parseFileName(lp);
-        else return true;
+        if (!parseFileName(lp))
+            return false;
+        if (acceptToken(lp, "<"))
+            return parseFileName(lp);
+        else
+            return true;
     }
 
     return true;
@@ -155,21 +159,20 @@ bool parseRedirections(List *lp) {
  */
 bool parseBuiltIn(List *lp) {
 
-    //
     // TODO: Implement the logic for these builtins, and extend with
     // more builtins down the line
-    //
 
     // NULL-terminated array makes it easy to expand this array later
     // without changing the code at other places.
     char *builtIns[] = {
-            "exit",
-            "status",
-            NULL
+        "exit",
+        "status",
+        NULL
     };
 
     for (int i = 0; builtIns[i] != NULL; i++) {
-        if (acceptToken(lp, builtIns[i])) return true;
+        if (acceptToken(lp, builtIns[i]))
+            return true;
     }
 
     return false;
@@ -185,13 +188,8 @@ bool parseBuiltIn(List *lp) {
  * @return a bool denoting whether the chain was parsed successfully.
  */
 bool parseChain(List *lp) {
-    if (parseBuiltIn(lp)) {
-        return parseOptions(lp);
-    }
-    if (parsePipeline(lp)) {
-        return parseRedirections(lp);
-    }
-    return false;
+    return (parseBuiltIn(lp) && parseOptions(lp))
+        || (parsePipeline(lp) && parseRedirections(lp));
 }
 
 /**
@@ -207,14 +205,14 @@ bool parseChain(List *lp) {
  * @param lp List pointer to the start of the tokenlist.
  * @return a bool denoting whether the inputline was parsed successfully.
  */
-bool parseInputLine(List *lp) {
-    if (isEmpty(*lp)) {
-        return true;
-    }
+InputLine parseInputLine(List *lp) {
+    InputLine inputLine;
 
-    if (!parseChain(lp)) {
+    if (isEmpty(*lp))
+        return true;
+
+    if (!parseChain(lp))
         return false;
-    }
 
     if (acceptToken(lp, "&") || acceptToken(lp, "&&")) {
         return parseInputLine(lp);
@@ -222,7 +220,7 @@ bool parseInputLine(List *lp) {
         return parseInputLine(lp);
     } else if (acceptToken(lp, ";")) {
         return parseInputLine(lp);
-    }
+    } // TODO: why not combine these into one if statement?
 
     return true;
 }

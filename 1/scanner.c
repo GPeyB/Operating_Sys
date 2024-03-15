@@ -187,9 +187,8 @@ void printList(List li) {
  * @param li the starting node of a list.
  */
 void freeTokenList(List li) {
-    if (li == NULL) {
+    if (li == NULL)
         return;
-    }
     free(li->t);
     freeTokenList(li->next);
     free(li);

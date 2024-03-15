@@ -4,17 +4,21 @@
 
 #include "scanner.h"
 #include "shell.h"
+#include "structures.h"
 
 int main(int argc, char *argv[]) {
+    setbuf(stdin, NULL);
+    setbuf(stdout, NULL);
+
     char *inputLine;
     List tokenList;
 
-    //TODO: Signal back that the loop must stop when "exit" has been encountered (or EOF)
+    // TODO: Signal back that the loop must stop when "exit" has been encountered (or EOF)
     while (true) {
         inputLine = readInputLine();
         tokenList = getTokenList(inputLine);
 
-        bool parsedSuccessfully = parseInputLine(&tokenList);
+        InputLine parsedSuccessfully = parseInputLine(&tokenList);
         if (tokenList == NULL && parsedSuccessfully) {
             // Input was parsed successfully and can be accessed in "tokenList"
 
@@ -23,7 +27,7 @@ int main(int argc, char *argv[]) {
             // command that you then construct in the parsing logic. It's up to you
             // to determine how to approach this!
 
-            
+
         } else {
             printf("Error: invalid syntax!\n");
         }
