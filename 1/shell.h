@@ -4,8 +4,6 @@
 #include "structures.h"
 #include <stdbool.h>
 
-bool parseInputLine(InputLine *inputLine, List *lp);
-
-void printTokenList(List l);
+bool parseInputLine(InputLine **inputLine, List *lp);
 
 #endif

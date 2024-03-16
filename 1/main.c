@@ -17,18 +17,23 @@ int main(int argc, char *argv[]) {
     while (true) {
         inputLine = readInputLine();
         tokenList = getTokenList(inputLine);
+        printList(tokenList);
+        // copy token list pointer to avoid losing the original pointer
+        List tokenListCopy = tokenList;
 
-        InputLine *parsedLine = inputline_create();
-        bool parsedSuccessfully = parseInputLine(parsedLine, &tokenList);
+        InputLine *line = NULL;
+        bool parsedSuccessfully = parseInputLine(&line, &tokenList);
         if (tokenList == NULL && parsedSuccessfully) {
             printf("Input line parsed successfully!\n");
+            inputline_print(line, 0);
         } else {
             printf("Error: invalid syntax!\n");
         }
 
+        inputline_destroy(line);
+        freeTokenList(tokenListCopy);
         free(inputLine);
-        freeTokenList(tokenList);
-        inputline_destroy(parsedLine);
+        exit(0);
     }
     
     return 0;

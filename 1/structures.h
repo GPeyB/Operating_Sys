@@ -28,17 +28,11 @@ struct Command {
     Options *options;
 };
 
-Command *command_create();
-void command_destroy(Command *command);
-
 struct Chain {
     Pipeline *pipeline;
     Redirections *redirections;
     Command *builtIn;
 };
-
-Chain *chain_create();
-void chain_destroy(Chain *chain);
 
 enum InputLineSep {
     BACKGROUND,
@@ -54,7 +48,14 @@ struct InputLine {
     InputLine *next;
 };
 
+Pipeline *pipeline_create();
+Redirections *redirections_create();
+Options *options_create();
+Command *command_create();
+Chain *chain_create();
 InputLine *inputline_create();
 void inputline_destroy(InputLine *inputLine);
+
+void inputline_print(InputLine *inputLine, int depth);
 
 #endif // STRUCTURES_H
