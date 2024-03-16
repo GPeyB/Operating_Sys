@@ -27,3 +27,9 @@ void command_print(Command *command, int depth) {
     if (command->options != NULL)
         options_print(command->options, depth);
 }
+
+int command_execute(Command *command) {
+    int status = 0;
+
+    return status;
+}

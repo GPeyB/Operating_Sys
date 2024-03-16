@@ -12,8 +12,6 @@ Pipeline *pipeline_create() {
     return pipeline;
 }
 
-void command_destroy(Command *command);
-
 void pipeline_destroy(Pipeline *pipeline) {
     if (pipeline->command != NULL)
         command_destroy(pipeline->command);
@@ -22,8 +20,6 @@ void pipeline_destroy(Pipeline *pipeline) {
     free(pipeline);
 }
 
-void command_print(Command *command, int depth);
-
 void pipeline_print(Pipeline *pipeline, int depth) {
     printDepth(depth++);
     printf("Pipeline:\n");
@@ -31,4 +27,16 @@ void pipeline_print(Pipeline *pipeline, int depth) {
         command_print(pipeline->command, depth);
     if (pipeline->pipeline != NULL)
         pipeline_print(pipeline->pipeline, depth);
+}
+
+int pipeline_execute(Pipeline *pipeline) {
+    int status = 0;
+
+    if (pipeline->command != NULL) {
+        status = command_execute(pipeline->command);
+    } else if (pipeline->pipeline != NULL) {
+        status = pipeline_execute(pipeline->pipeline);
+    }
+
+    return status;
 }

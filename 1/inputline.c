@@ -48,3 +48,30 @@ void inputline_print(InputLine *inputLine, int depth) {
     if (inputLine->next != NULL)
         inputline_print(inputLine->next, depth);
 }
+
+int inputline_execute(InputLine *inputLine) {
+    int status = 0;
+
+    if (inputLine->chain != NULL)
+        status = chain_execute(inputLine->chain);
+
+    switch (inputLine->sep) {
+    case BACKGROUND:
+        break;
+    case AND:
+        if (status == 0)
+            status = inputline_execute(inputLine->next);
+        break;
+    case OR:
+        if (status != 0)
+            status = inputline_execute(inputLine->next);
+        break;
+    case SEMICOLON:
+        status = inputline_execute(inputLine->next);
+        break;
+    case NONE:
+        break;
+    }
+
+    return status;
+}

@@ -21,7 +21,7 @@ void chain_destroy(Chain *chain) {
     if (chain->redirections != NULL)
         redirections_destroy(chain->redirections);
     if (chain->builtIn != NULL)
-        command_destroy(chain->builtIn);
+        builtin_destroy(chain->builtIn);
     free(chain);
 }
 
@@ -33,5 +33,17 @@ void chain_print(Chain *chain, int depth) {
     if (chain->redirections != NULL)
         redirections_print(chain->redirections, depth);
     if (chain->builtIn != NULL)
-        command_print(chain->builtIn, depth);
+        builtin_print(chain->builtIn, depth);
+}
+
+int chain_execute(Chain *chain) {
+    int status = 0;
+
+    if (chain->builtIn != NULL) {
+        status = builtin_execute(chain->builtIn);
+    } else if (chain->pipeline != NULL) {
+        status = pipeline_execute(chain->pipeline);
+    }
+
+    return status;
 }

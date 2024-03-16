@@ -6,6 +6,9 @@
 #include "shell.h"
 #include "inputline.h"
 
+bool exitShell = false;
+int status = 0;
+
 int main(int argc, char *argv[]) {
     setbuf(stdin, NULL);
     setbuf(stdout, NULL);
@@ -13,12 +16,11 @@ int main(int argc, char *argv[]) {
     char *inputLine;
     List tokenList;
 
-    bool exitShell = false;
     while (!exitShell) {
         printf("shell> ");
+
         inputLine = readInputLine();
         tokenList = getTokenList(inputLine);
-        printList(tokenList);
         // copy token list pointer to avoid losing the original pointer
         List tokenListCopy = tokenList;
 
@@ -26,6 +28,8 @@ int main(int argc, char *argv[]) {
         bool parsedSuccessfully = parseInputLine(&line, &tokenList);
         if (tokenList == NULL && parsedSuccessfully) {
             printf("Parsed successfully!\n");
+            inputline_print(line, 0);
+            status = inputline_execute(line);
         } else {
             printf("Error: invalid syntax!\n");
         }

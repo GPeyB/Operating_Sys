@@ -1,6 +1,13 @@
 #ifndef REDIRECTIONS_H
 #define REDIRECTIONS_H
 
+/**
+ * <redirections> ::= "<" <filename> ">" <filename>
+ *                 |  ">" <filename> "<" <filename>
+ *                 |  "<" <filename>
+ *                 |  ">" <filename>
+ *                 |  <empty>
+ */
 typedef struct Redirections {
     char *input;
     char *output;

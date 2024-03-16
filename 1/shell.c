@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "scanner.h"
 #include "inputline.h"
+#include "scanner.h"
 
 char *OPERATORS[] = {
     "&",
@@ -121,14 +121,14 @@ bool parseRedirections(Redirections **redirections, List *tokens) {
     return true;
 }
 
-bool parseBuiltIn(Command **command, List *tokens) {
-    *command = command_create();
-    Command *c = *command;
+bool parseBuiltIn(BuiltIn **builtIn, List *tokens) {
+    *builtIn = builtin_create();
+    BuiltIn *b = *builtIn;
 
     for (int i = 0; BUILTINS[i] != NULL; i++) {
         if (acceptToken(tokens, BUILTINS[i])) {
-            c->name = BUILTINS[i];
-            return acceptOptions(&c->options, tokens);
+            b->name = BUILTINS[i];
+            return acceptOptions(&b->options, tokens);
         }
     }
 
@@ -143,9 +143,9 @@ bool parseChain(Chain **chain, List *tokens) {
     *chain = chain_create();
     Chain *c = *chain;
 
-    return (parsePipeline(&c->pipeline, tokens)
-               && parseRedirections(&c->redirections, tokens))
-        || parseBuiltIn(&c->builtIn, tokens);
+    return parseBuiltIn(&c->builtIn, tokens)
+        || (parsePipeline(&c->pipeline, tokens)
+            && parseRedirections(&c->redirections, tokens));
 }
 
 /**
