@@ -4,223 +4,167 @@
 #include "scanner.h"
 #include "structures.h"
 
-/**
- * The function acceptToken checks whether the current token matches a target identifier,
- * and goes to the next token if this is the case.
- * @param lp List pointer to the start of the tokenlist.
- * @param ident target identifier
- * @return a bool denoting whether the current token matches the target identifier.
- */
-bool acceptToken(List *lp, char *ident) {
-    if (*lp != NULL && strcmp(((*lp)->t), ident) == 0) {
-        *lp = (*lp)->next;
+char *OPERATORS[] = {
+    "&",
+    "&&",
+    "||",
+    ";",
+    "<",
+    ">",
+    "|",
+    NULL
+};
+
+char *BUILTINS[] = {
+    "exit",
+    "status",
+    NULL
+};
+
+bool acceptToken(List *tokens, char *ident) {
+    if (*tokens != NULL && strcmp(((*tokens)->t), ident) == 0) {
+        *tokens = (*tokens)->next;
         return true;
     }
     return false;
 }
 
-/**
- * The function parseExecutable parses an executable.
- * @param lp List pointer to the start of the tokenlist.
- * @return a bool denoting whether the executable was parsed successfully.
- */
-bool parseExecutable(List *lp) {
-
-    // TODO: Determine whether to accept parsing an executable here.
-    //
-    // It is not recommended to check for existence of the executable already
-    // here, since then it'll be hard to continue parsing the rest of the input
-    // line (command execution should continue after a "not found" command),
-    // it'll also be harder to print the correct error message.
-    //
-    // Instead, we recommend to just do a syntactical check here, which makes
-    // more sense, and defer the binary existence check to the runtime part
-    // you'll write later.
-
-    return true;
-}
-
-/**
- * Checks whether the input string \param s is an operator.
- * @param s input string.
- * @return a bool denoting whether the current string is an operator.
- */
 bool isOperator(char *s) {
-    // NULL-terminated array makes it easy to expand this array later
-    // without changing the code at other places.
-    char *operators[] = {
-        "&",
-        "&&",
-        "||",
-        ";",
-        "<",
-        ">",
-        "|",
-        NULL
-    };
-
-    for (int i = 0; operators[i] != NULL; i++) {
-        if (strcmp(s, operators[i]) == 0)
+    for (int i = 0; OPERATORS[i] != NULL; i++) {
+        if (strcmp(s, OPERATORS[i]) == 0)
             return true;
     }
     return false;
 }
 
-/**
- * The function parseOptions parses options.
- * @param lp List pointer to the start of the tokenlist.
- * @return a bool denoting whether the options were parsed successfully.
- */
-bool parseOptions(List *lp) {
-    // TODO: store each (*lp)->t as an option, if any exist
-    while (*lp != NULL && !isOperator((*lp)->t))
-        (*lp) = (*lp)->next;
+bool acceptExecutable(char *name, List *tokens) {
+    if (isEmpty(*tokens) || isOperator((*tokens)->t))
+        return false;
+    name = (*tokens)->t;
+    *tokens = (*tokens)->next;
+    return true;
+}
+
+bool acceptOptions(Options *options, List *tokens) {
+    while (*tokens != NULL && !isOperator((*tokens)->t)) {
+        options->options[options->nrOptions++] = (*tokens)->t;
+        (*tokens) = (*tokens)->next;
+    }
     return true;
 }
 
 /**
- * The function parseRedirections parses a command according to the grammar:
- *
- * <command>        ::= <executable> <options>
- *
- * @param lp List pointer to the start of the tokenlist.
- * @return a bool denoting whether the command was parsed successfully.
+ * <command> ::= <executable> <options>
  */
-bool parseCommand(List *lp) {
-    return parseExecutable(lp) && parseOptions(lp);
+bool parseCommand(Command *command, List *tokens) {
+    return acceptExecutable(command->name, tokens) && acceptOptions(command->options, tokens);
 }
 
 /**
- * The function parsePipeline parses a pipeline according to the grammar:
- *
- * <pipeline>           ::= <command> "|" <pipeline>
- *                       | <command>
- *
- * @param lp List pointer to the start of the tokenlist.
- * @return a bool denoting whether the pipeline was parsed successfully.
+ * <pipeline> ::= <command> "|" <pipeline>
+ *             |  <command>
  */
-bool parsePipeline(List *lp) {
-    if (!parseCommand(lp))
+bool parsePipeline(Pipeline *pipeline, List *tokens) {
+    if (!parseCommand(pipeline->command, tokens))
         return false;
 
-    if (acceptToken(lp, "|"))
-        return parsePipeline(lp);
+    if (acceptToken(tokens, "|"))
+        return parsePipeline(pipeline->pipeline, tokens);
 
     return true;
 }
 
-/**
- * The function parseFileName parses a filename.
- * @param lp List pointer to the start of the tokenlist.
- * @return a bool denoting whether the filename was parsed successfully.
- */
-bool parseFileName(List *lp) {
-    // TODO: Process the file name appropriately
-    //char *fileName = (*lp)->t;
+bool parseFileName(char *name, List *tokens) {
+    if (isEmpty(*tokens) || isOperator((*tokens)->t))
+        return false;
+    name = (*tokens)->t;
+    *tokens = (*tokens)->next;
     return true;
 }
 
 /**
- * The function parseRedirections parses redirections according to the grammar:
- *
- * <redirections>       ::= <pipeline> <redirections>
- *                       |  <builtin> <options>
- *
- * @param lp List pointer to the start of the tokenlist.
- * @return a bool denoting whether the redirections were parsed successfully.
+ * <redirections> ::= "<" <filename> ">" <filename>
+ *                 |  ">" <filename> "<" <filename>
+ *                 |  "<" <filename>
+ *                 |  ">" <filename>
+ *                 |  <empty>
  */
-bool parseRedirections(List *lp) {
-    if (isEmpty(*lp))
+bool parseRedirections(Redirections *redirections, List *tokens) {
+    if (isEmpty(*tokens))
         return true;
 
-    if (acceptToken(lp, "<")) {
-        if (!parseFileName(lp))
+    if (acceptToken(tokens, "<")) {
+        if (!parseFileName(redirections->input, tokens))
             return false;
-        if (acceptToken(lp, ">"))
-            return parseFileName(lp);
-        else
-            return true;
-    } else if (acceptToken(lp, ">")) {
-        if (!parseFileName(lp))
+        if (acceptToken(tokens, ">"))
+            return parseFileName(redirections->output, tokens);
+    } else if (acceptToken(tokens, ">")) {
+        if (!parseFileName(redirections->output, tokens))
             return false;
-        if (acceptToken(lp, "<"))
-            return parseFileName(lp);
-        else
-            return true;
+        if (acceptToken(tokens, "<"))
+            return parseFileName(redirections->input, tokens);
     }
 
     return true;
 }
 
-/**
- * The function parseBuiltIn parses a builtin.
- * @param lp List pointer to the start of the tokenlist.
- * @return a bool denoting whether the builtin was parsed successfully.
- */
-bool parseBuiltIn(List *lp) {
-
-    // TODO: Implement the logic for these builtins, and extend with
-    // more builtins down the line
-
-    // NULL-terminated array makes it easy to expand this array later
-    // without changing the code at other places.
-    char *builtIns[] = {
-        "exit",
-        "status",
-        NULL
-    };
-
-    for (int i = 0; builtIns[i] != NULL; i++) {
-        if (acceptToken(lp, builtIns[i]))
-            return true;
+bool parseBuiltIn(Command *command, List *tokens) {
+    for (int i = 0; BUILTINS[i] != NULL; i++) {
+        if (acceptToken(tokens, BUILTINS[i])) {
+            command->name = BUILTINS[i];
+            return acceptOptions(command->options, tokens);
+        }
     }
 
     return false;
 }
 
 /**
- * The function parseChain parses a chain according to the grammar:
- *
- * <chain>              ::= <pipeline> <redirections>
- *                       |  <builtin> <options>
- *
- * @param lp List pointer to the start of the tokenlist.
- * @return a bool denoting whether the chain was parsed successfully.
+ * <chain> ::= <pipeline> <redirections>
+ *          |  <builtin> <options>
  */
-bool parseChain(List *lp) {
-    return (parseBuiltIn(lp) && parseOptions(lp))
-        || (parsePipeline(lp) && parseRedirections(lp));
+bool parseChain(Chain *chain, List *tokens) {
+    return (parsePipeline(chain->pipeline, tokens)
+               && parseRedirections(chain->redirections, tokens))
+        || parseBuiltIn(chain->builtIn, tokens);
 }
 
 /**
- * The function parseInputLine parses an inputline according to the grammar:
- *
- * <inputline>      ::= <chain> & <inputline>
- *                   | <chain> && <inputline>
- *                   | <chain> || <inputline>
- *                   | <chain> ; <inputline>
- *                   | <chain>
- *                   | <empty>
- *
- * @param lp List pointer to the start of the tokenlist.
- * @return a bool denoting whether the inputline was parsed successfully.
+ * <inputline> ::= <chain> & <inputline>
+ *              | <chain> && <inputline>
+ *              | <chain> || <inputline>
+ *              | <chain> ; <inputline>
+ *              | <chain>
+ *              | <empty>
  */
-InputLine parseInputLine(List *lp) {
-    InputLine inputLine;
-
-    if (isEmpty(*lp))
+bool parseInputLine(InputLine *inputLine, List *tokens) {
+    if (isEmpty(*tokens))
         return true;
 
-    if (!parseChain(lp))
+    if (!parseChain(inputLine->chain, tokens))
         return false;
 
-    if (acceptToken(lp, "&") || acceptToken(lp, "&&")) {
-        return parseInputLine(lp);
-    } else if (acceptToken(lp, "||")) {
-        return parseInputLine(lp);
-    } else if (acceptToken(lp, ";")) {
-        return parseInputLine(lp);
-    } // TODO: why not combine these into one if statement?
+    if (acceptToken(tokens, "&"))
+        inputLine->sep = BACKGROUND;
+    else if (acceptToken(tokens, "&&"))
+        inputLine->sep = AND;
+    else if (acceptToken(tokens, "||"))
+        inputLine->sep = OR;
+    else if (acceptToken(tokens, ";"))
+        inputLine->sep = SEMICOLON;
+    else
+        return false;
 
-    return true;
+    return parseInputLine(inputLine->next, tokens);
+}
+
+#include <stdio.h>
+
+void printTokenList(List l) {
+    if (l == NULL) {
+        printf("NULL\n");
+        return;
+    }
+    printf("%s ", l->t);
+    printTokenList(l->next);
 }

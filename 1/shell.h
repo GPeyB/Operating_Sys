@@ -1,8 +1,11 @@
 #ifndef SHELL_SHELL_H
 #define SHELL_SHELL_H
 
+#include "structures.h"
 #include <stdbool.h>
 
-bool parseInputLine(List *lp);
+bool parseInputLine(InputLine *inputLine, List *lp);
+
+void printTokenList(List l);
 
 #endif

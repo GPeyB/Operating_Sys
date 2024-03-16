@@ -18,22 +18,17 @@ int main(int argc, char *argv[]) {
         inputLine = readInputLine();
         tokenList = getTokenList(inputLine);
 
-        InputLine parsedSuccessfully = parseInputLine(&tokenList);
+        InputLine *parsedLine = inputline_create();
+        bool parsedSuccessfully = parseInputLine(parsedLine, &tokenList);
         if (tokenList == NULL && parsedSuccessfully) {
-            // Input was parsed successfully and can be accessed in "tokenList"
-
-            // However, this is still a simple list of strings, it might be convenient
-            // to build some intermediate structure representing the input line or a
-            // command that you then construct in the parsing logic. It's up to you
-            // to determine how to approach this!
-
-
+            printf("Input line parsed successfully!\n");
         } else {
             printf("Error: invalid syntax!\n");
         }
 
         free(inputLine);
         freeTokenList(tokenList);
+        inputline_destroy(parsedLine);
     }
     
     return 0;
