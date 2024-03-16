@@ -4,7 +4,7 @@
 
 #include "scanner.h"
 #include "shell.h"
-#include "structures.h"
+#include "inputline.h"
 
 int main(int argc, char *argv[]) {
     setbuf(stdin, NULL);
@@ -13,8 +13,9 @@ int main(int argc, char *argv[]) {
     char *inputLine;
     List tokenList;
 
-    // TODO: Signal back that the loop must stop when "exit" has been encountered (or EOF)
-    while (true) {
+    bool exitShell = false;
+    while (!exitShell) {
+        printf("shell> ");
         inputLine = readInputLine();
         tokenList = getTokenList(inputLine);
         printList(tokenList);
@@ -24,8 +25,7 @@ int main(int argc, char *argv[]) {
         InputLine *line = NULL;
         bool parsedSuccessfully = parseInputLine(&line, &tokenList);
         if (tokenList == NULL && parsedSuccessfully) {
-            printf("Input line parsed successfully!\n");
-            inputline_print(line, 0);
+            printf("Parsed successfully!\n");
         } else {
             printf("Error: invalid syntax!\n");
         }
@@ -33,8 +33,7 @@ int main(int argc, char *argv[]) {
         inputline_destroy(line);
         freeTokenList(tokenListCopy);
         free(inputLine);
-        exit(0);
     }
-    
+
     return 0;
 }

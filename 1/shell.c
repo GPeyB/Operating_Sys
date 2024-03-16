@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "scanner.h"
-#include "structures.h"
+#include "inputline.h"
 
 char *OPERATORS[] = {
     "&",
