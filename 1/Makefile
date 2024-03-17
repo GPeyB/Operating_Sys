@@ -1,9 +1,10 @@
 all: shell
 
-SHELL_FILES = $(filter-out test.c, $(wildcard *.c)) # exclude test.c from shell compilation
+# exclude test.c from shell compilation
+SHELL_FILES = $(filter-out test.c, $(wildcard *.c))
 
 shell: *.c *.h
-	gcc -std=c99 -Wall -pedantic $(SHELL_FILES) -o shell -g
+	gcc -std=c99 -Wall -pedantic $(SHELL_FILES) -o shell -g -DBONUS
 
 test: test.c
 	gcc -std=c99 -Wall -pedantic test.c -o test -g

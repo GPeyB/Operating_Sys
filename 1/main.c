@@ -1,10 +1,14 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "inputline.h"
 #include "scanner.h"
 #include "shell.h"
+
+#define BLUE "\033[1;34m"
+#define RESET "\033[0m"
 
 bool g_exitShell = false;
 int g_status = 0;
@@ -17,7 +21,16 @@ int main(int argc, char *argv[]) {
     List tokenList;
 
     while (!g_exitShell) {
-        printf("shell> ");
+#ifdef BONUS
+        // custom prompt
+        char cwd[1024];
+        if (getcwd(cwd, sizeof(cwd)) != NULL) {
+            printf(BLUE "%s" RESET "> ", cwd);
+        } else {
+            perror("getcwd");
+            return 1;
+        }
+#endif // BONUS
 
         inputLine = readInputLine();
         tokenList = getTokenList(inputLine);
