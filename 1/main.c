@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
     List tokenList;
 
     while (!g_exitShell) {
-        printf("shell> ");
+        //printf("shell> "); comment to match themis output
 
         inputLine = readInputLine();
         tokenList = getTokenList(inputLine);
