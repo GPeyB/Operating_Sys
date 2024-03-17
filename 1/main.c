@@ -1,13 +1,13 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
+#include "inputline.h"
 #include "scanner.h"
 #include "shell.h"
-#include "inputline.h"
 
-bool exitShell = false;
-int status = 0;
+bool g_exitShell = false;
+int g_status = 0;
 
 int main(int argc, char *argv[]) {
     setbuf(stdin, NULL);
@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     char *inputLine;
     List tokenList;
 
-    while (!exitShell) {
+    while (!g_exitShell) {
         printf("shell> ");
 
         inputLine = readInputLine();
@@ -29,7 +29,8 @@ int main(int argc, char *argv[]) {
         if (tokenList == NULL && parsedSuccessfully) {
             printf("Parsed successfully!\n");
             inputline_print(line, 0);
-            //status = inputline_execute(line);
+            g_status = inputline_execute(line);
+            printf("Exit status: %d\n", g_status);
         } else {
             printf("Error: invalid syntax!\n");
             inputline_print(line, 0);

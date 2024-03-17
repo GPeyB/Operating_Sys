@@ -6,6 +6,9 @@
 #include "options.h"
 #include "util.h"
 
+extern bool g_exitShell;
+extern int g_status;
+
 BuiltIn *builtin_create() {
     BuiltIn *builtIn = (BuiltIn *)malloc(sizeof(BuiltIn));
     builtIn->name = NULL;
@@ -36,9 +39,9 @@ int builtin_execute(BuiltIn *builtIn) {
     int status = 0;
 
     if (strcmp(builtIn->name, "exit") == 0) {
-        exitShell = true;
-    } else if (strcmp(builtIn->name, "cd") == 0) {
-        printf("cd\n");
+        g_exitShell = true;
+    } else if (strcmp(builtIn->name, "status") == 0) {
+        printf("The most recent exit code is: %d\n", g_status);
     }
 
     return status;

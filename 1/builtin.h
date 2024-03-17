@@ -5,8 +5,6 @@
 
 #include "options.h"
 
-extern bool exitShell;
-
 typedef struct BuiltIn {
     char *name;
     Options *options;
