@@ -12,11 +12,14 @@ Command *command_create() {
     return command;
 }
 
-void command_destroy(Command *command) {
-    // don't free command->name, as it's a pointer to an element of the token list
-    if (command->options != NULL)
-        options_destroy(command->options);
-    free(command);
+void command_destroy(Command **command) {
+    Command *c = *command;
+    // don't free name, as it's a pointer to an element of the token list
+    c->name = NULL;
+    if (c->options != NULL)
+        options_destroy(&c->options);
+    free(c);
+    *command = NULL;
 }
 
 void command_print(Command *command, int depth) {

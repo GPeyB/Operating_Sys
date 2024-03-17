@@ -14,7 +14,7 @@ typedef struct Redirections {
 } Redirections;
 
 Redirections *redirections_create();
-void redirections_destroy(Redirections *redirections);
+void redirections_destroy(Redirections **redirections);
 void redirections_print(Redirections *redirections, int depth);
 
 #endif // REDIRECTIONS_H

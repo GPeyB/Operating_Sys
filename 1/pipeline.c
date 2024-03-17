@@ -12,12 +12,14 @@ Pipeline *pipeline_create() {
     return pipeline;
 }
 
-void pipeline_destroy(Pipeline *pipeline) {
-    if (pipeline->command != NULL)
-        command_destroy(pipeline->command);
-    if (pipeline->pipeline != NULL)
-        pipeline_destroy(pipeline->pipeline);
-    free(pipeline);
+void pipeline_destroy(Pipeline **pipeline) {
+    Pipeline *p = *pipeline;
+    if (p->command != NULL)
+        command_destroy(&p->command);
+    if (p->pipeline != NULL)
+        pipeline_destroy(&p->pipeline);
+    free(p);
+    *pipeline = NULL;
 }
 
 void pipeline_print(Pipeline *pipeline, int depth) {

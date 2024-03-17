@@ -54,6 +54,8 @@ bool acceptOptions(Options **options, List *tokens) {
         o->options[o->nrOptions++] = (*tokens)->t;
         (*tokens) = (*tokens)->next;
     }
+    if (o->nrOptions == 0)
+        options_destroy(options);
     return true;
 }
 
@@ -75,11 +77,16 @@ bool parsePipeline(Pipeline **pipeline, List *tokens) {
     *pipeline = pipeline_create();
     Pipeline *p = *pipeline;
 
-    if (!parseCommand(&p->command, tokens))
+    if (!parseCommand(&p->command, tokens)) {
+        pipeline_destroy(pipeline);
         return false;
+    }
 
     if (acceptToken(tokens, "|"))
-        return parsePipeline(&p->pipeline, tokens);
+        if (!parsePipeline(&p->pipeline, tokens)) {
+            pipeline_destroy(pipeline);
+            return false;
+        }
 
     return true;
 }
@@ -100,11 +107,11 @@ bool parseFileName(char **name, List *tokens) {
  *                 |  <empty>
  */
 bool parseRedirections(Redirections **redirections, List *tokens) {
-    *redirections = redirections_create();
-    Redirections *r = *redirections;
-
     if (isEmpty(*tokens))
         return true;
+
+    *redirections = redirections_create();
+    Redirections *r = *redirections;
 
     if (acceptToken(tokens, "<")) {
         if (!parseFileName(&r->input, tokens))
@@ -118,6 +125,7 @@ bool parseRedirections(Redirections **redirections, List *tokens) {
             return parseFileName(&r->input, tokens);
     }
 
+    redirections_destroy(redirections);
     return true;
 }
 
@@ -132,6 +140,7 @@ bool parseBuiltIn(BuiltIn **builtIn, List *tokens) {
         }
     }
 
+    builtin_destroy(builtIn);
     return false;
 }
 
@@ -141,11 +150,13 @@ bool parseBuiltIn(BuiltIn **builtIn, List *tokens) {
  */
 bool parseChain(Chain **chain, List *tokens) {
     *chain = chain_create();
-    Chain *c = *chain;
 
-    return parseBuiltIn(&c->builtIn, tokens)
-        || (parsePipeline(&c->pipeline, tokens)
-            && parseRedirections(&c->redirections, tokens));
+    bool parsed = parseBuiltIn(&(*chain)->builtIn, tokens)
+        || (parsePipeline(&(*chain)->pipeline, tokens)
+            && parseRedirections(&(*chain)->redirections, tokens));
+    if (!parsed)
+        chain_destroy(chain);
+    return parsed;
 }
 
 /**

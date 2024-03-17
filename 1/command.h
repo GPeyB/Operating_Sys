@@ -9,7 +9,7 @@ typedef struct Command {
 } Command;
 
 Command *command_create();
-void command_destroy(Command *command);
+void command_destroy(Command **command);
 void command_print(Command *command, int depth);
 int command_execute(Command *command);
 

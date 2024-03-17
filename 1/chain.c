@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "chain.h"
 #include "command.h"
@@ -15,14 +15,16 @@ Chain *chain_create() {
     return chain;
 }
 
-void chain_destroy(Chain *chain) {
-    if (chain->pipeline != NULL)
-        pipeline_destroy(chain->pipeline);
-    if (chain->redirections != NULL)
-        redirections_destroy(chain->redirections);
-    if (chain->builtIn != NULL)
-        builtin_destroy(chain->builtIn);
-    free(chain);
+void chain_destroy(Chain **chain) {
+    Chain *c = *chain;
+    if (c->pipeline != NULL)
+        pipeline_destroy(&c->pipeline);
+    if (c->redirections != NULL)
+        redirections_destroy(&c->redirections);
+    if (c->builtIn != NULL)
+        builtin_destroy(&c->builtIn);
+    free(c);
+    *chain = NULL;
 }
 
 void chain_print(Chain *chain, int depth) {

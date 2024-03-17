@@ -13,12 +13,14 @@ InputLine *inputline_create() {
     return inputLine;
 }
 
-void inputline_destroy(InputLine *inputLine) {
-    if (inputLine->chain != NULL)
-        chain_destroy(inputLine->chain);
-    if (inputLine->next != NULL)
-        inputline_destroy(inputLine->next);
-    free(inputLine);
+void inputline_destroy(InputLine **inputLine) {
+    InputLine *i = *inputLine;
+    if (i->chain != NULL)
+        chain_destroy(&i->chain);
+    if (i->next != NULL)
+        inputline_destroy(&i->next);
+    free(i);
+    *inputLine = NULL;
 }
 
 void inputline_print(InputLine *inputLine, int depth) {
@@ -26,24 +28,25 @@ void inputline_print(InputLine *inputLine, int depth) {
     printf("InputLine:\n");
     if (inputLine->chain != NULL)
         chain_print(inputLine->chain, depth);
-    printDepth(depth);
-    printf("separator: ");
-    switch (inputLine->sep) {
-    case BACKGROUND:
-        printf("&\n");
-        break;
-    case AND:
-        printf("&&\n");
-        break;
-    case OR:
-        printf("||\n");
-        break;
-    case SEMICOLON:
-        printf(";\n");
-        break;
-    case NONE:
-        printf("NONE\n");
-        break;
+    if (inputLine->sep != NONE) {
+        printDepth(depth);
+        printf("separator: ");
+        switch (inputLine->sep) {
+        case BACKGROUND:
+            printf("&\n");
+            break;
+        case AND:
+            printf("&&\n");
+            break;
+        case OR:
+            printf("||\n");
+            break;
+        case SEMICOLON:
+            printf(";\n");
+            break;
+        case NONE:
+            break;
+        }
     }
     if (inputLine->next != NULL)
         inputline_print(inputLine->next, depth);

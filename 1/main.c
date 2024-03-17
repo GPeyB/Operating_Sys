@@ -29,12 +29,13 @@ int main(int argc, char *argv[]) {
         if (tokenList == NULL && parsedSuccessfully) {
             printf("Parsed successfully!\n");
             inputline_print(line, 0);
-            status = inputline_execute(line);
+            //status = inputline_execute(line);
         } else {
             printf("Error: invalid syntax!\n");
+            inputline_print(line, 0);
         }
 
-        inputline_destroy(line);
+        inputline_destroy(&line);
         freeTokenList(tokenListCopy);
         free(inputLine);
     }

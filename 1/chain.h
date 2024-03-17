@@ -16,7 +16,7 @@ typedef struct Chain {
 } Chain;
 
 Chain *chain_create();
-void chain_destroy(Chain *chain);
+void chain_destroy(Chain **chain);
 void chain_print(Chain *chain, int depth);
 int chain_execute(Chain *chain);
 

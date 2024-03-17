@@ -13,10 +13,15 @@ Options *options_create() {
     return options;
 }
 
-void options_destroy(Options *options) {
-    // don't free options->options, as they're pointers to elements of the token list
-    free(options->options);
-    free(options);
+void options_destroy(Options **options) {
+    Options *o = *options;
+    // don't free options, as they're pointers to elements of the token list
+    for (int i = 0; i < o->nrOptions; i++) {
+        o->options[i] = NULL;
+    }
+    free(o->options);
+    free(o);
+    *options = NULL;
 }
 
 void options_print(Options *options, int depth) {

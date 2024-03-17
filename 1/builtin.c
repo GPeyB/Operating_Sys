@@ -13,11 +13,14 @@ BuiltIn *builtin_create() {
     return builtIn;
 }
 
-void builtin_destroy(BuiltIn *builtIn) {
-    // don't free builtin->name, as it's a pointer to an element of the token list
-    if (builtIn->options != NULL)
-        options_destroy(builtIn->options);
-    free(builtIn);
+void builtin_destroy(BuiltIn **builtIn) {
+    BuiltIn *b = *builtIn;
+    // don't free name, as it's a pointer to an element of the token list
+    b->name = NULL;
+    if (b->options != NULL)
+        options_destroy(&b->options);
+    free(b);
+    *builtIn = NULL;
 }
 
 void builtin_print(BuiltIn *builtIn, int depth) {

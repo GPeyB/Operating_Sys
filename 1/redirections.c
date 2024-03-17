@@ -11,10 +11,13 @@ Redirections *redirections_create() {
     return redirections;
 }
 
-void redirections_destroy(Redirections *redirections) {
-    // don't free redirections->input and redirections->output,
-    // as they're pointers to elements of the token list
-    free(redirections);
+void redirections_destroy(Redirections **redirections) {
+    Redirections *r = *redirections;
+    // don't free input and output, as they're pointers to elements of the token list
+    r->input = NULL;
+    r->output = NULL;
+    free(r);
+    *redirections = NULL;
 }
 
 void redirections_print(Redirections *redirections, int depth) {

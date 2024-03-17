@@ -26,7 +26,7 @@ typedef struct InputLine {
 } InputLine;
 
 InputLine *inputline_create();
-void inputline_destroy(InputLine *inputLine);
+void inputline_destroy(InputLine **inputLine);
 void inputline_print(InputLine *inputLine, int depth);
 int inputline_execute(InputLine *inputLine);
 
