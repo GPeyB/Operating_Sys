@@ -31,14 +31,10 @@ void pipeline_print(Pipeline *pipeline, int depth) {
         pipeline_print(pipeline->pipeline, depth);
 }
 
-int pipeline_execute(Pipeline *pipeline) {
-    int status = 0;
-
+void pipeline_execute(Pipeline *pipeline) {
     if (pipeline->command != NULL) {
-        status = command_execute(pipeline->command);
+        command_execute(pipeline->command);
     } else if (pipeline->pipeline != NULL) {
-        status = pipeline_execute(pipeline->pipeline);
+        pipeline_execute(pipeline->pipeline);
     }
-
-    return status;
 }

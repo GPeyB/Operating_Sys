@@ -38,14 +38,10 @@ void chain_print(Chain *chain, int depth) {
         builtin_print(chain->builtIn, depth);
 }
 
-int chain_execute(Chain *chain) {
-    int status = 0;
-
+void chain_execute(Chain *chain) {
     if (chain->builtIn != NULL) {
-        status = builtin_execute(chain->builtIn);
+        builtin_execute(chain->builtIn);
     } else if (chain->pipeline != NULL) {
-        status = pipeline_execute(chain->pipeline);
+        pipeline_execute(chain->pipeline);
     }
-
-    return status;
 }

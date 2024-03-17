@@ -3,6 +3,7 @@
 
 #include "command.h"
 #include "options.h"
+#include "shared.h"
 #include "util.h"
 
 Command *command_create() {
@@ -31,8 +32,8 @@ void command_print(Command *command, int depth) {
         options_print(command->options, depth);
 }
 
-int command_execute(Command *command) {
-    int status = 0;
-
-    return status;
+void command_execute(Command *command) {
+    printf("Executing command: %s\n", command->name);
+    // TODO: Implement command execution
+    g_status = 0;
 }

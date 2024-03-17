@@ -18,6 +18,6 @@ typedef struct Chain {
 Chain *chain_create();
 void chain_destroy(Chain **chain);
 void chain_print(Chain *chain, int depth);
-int chain_execute(Chain *chain);
+void chain_execute(Chain *chain);
 
 #endif // CHAIN_H

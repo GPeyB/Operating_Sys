@@ -3,6 +3,7 @@
 
 #include "chain.h"
 #include "inputline.h"
+#include "shared.h"
 #include "util.h"
 
 InputLine *inputline_create() {
@@ -52,29 +53,25 @@ void inputline_print(InputLine *inputLine, int depth) {
         inputline_print(inputLine->next, depth);
 }
 
-int inputline_execute(InputLine *inputLine) {
-    int status = 0;
-
+void inputline_execute(InputLine *inputLine) {
     if (inputLine->chain != NULL)
-        status = chain_execute(inputLine->chain);
+        chain_execute(inputLine->chain);
 
     switch (inputLine->sep) {
     case BACKGROUND:
         break;
     case AND:
-        if (status == 0)
-            status = inputline_execute(inputLine->next);
+        if (g_status == 0)
+            inputline_execute(inputLine->next);
         break;
     case OR:
-        if (status != 0)
-            status = inputline_execute(inputLine->next);
+        if (g_status != 0)
+            inputline_execute(inputLine->next);
         break;
     case SEMICOLON:
-        status = inputline_execute(inputLine->next);
+        inputline_execute(inputLine->next);
         break;
     case NONE:
         break;
     }
-
-    return status;
 }

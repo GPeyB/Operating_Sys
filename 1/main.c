@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
         if (tokenList == NULL && parsedSuccessfully) {
             printf("Parsed successfully!\n");
             inputline_print(line, 0);
-            g_status = inputline_execute(line);
+            inputline_execute(line);
             printf("Exit status: %d\n", g_status);
         } else {
             printf("Error: invalid syntax!\n");
