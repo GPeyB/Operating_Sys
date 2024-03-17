@@ -4,6 +4,13 @@
 
 #include "inputline.h"
 #include "scanner.h"
+#include "shell.h"
+#include "options.h"
+#include "pipeline.h"
+#include "redirections.h"
+#include "builtin.h"
+#include "chain.h"
+#include "command.h"
 
 char *OPERATORS[] = {
     "&",
@@ -160,11 +167,11 @@ bool parseChain(Chain **chain, List *tokens) {
 
 /**
  * <inputline> ::= <chain> & <inputline>
- *              | <chain> && <inputline>
- *              | <chain> || <inputline>
- *              | <chain> ; <inputline>
- *              | <chain>
- *              | <empty>
+ *              |  <chain> && <inputline>
+ *              |  <chain> || <inputline>
+ *              |  <chain> ; <inputline>
+ *              |  <chain>
+ *              |  <empty>
  */
 bool parseInputLine(InputLine **inputLine, List *tokens) {
     *inputLine = inputline_create();

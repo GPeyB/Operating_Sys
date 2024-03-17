@@ -53,25 +53,9 @@ void inputline_print(InputLine *inputLine, int depth) {
         inputline_print(inputLine->next, depth);
 }
 
-void inputline_execute(InputLine *inputLine) {
+void inputline_execute(InputLine *inputLine, enum InputLineSep sep) {
     if (inputLine->chain != NULL)
-        chain_execute(inputLine->chain);
-
-    switch (inputLine->sep) {
-    case BACKGROUND:
-        break;
-    case AND:
-        if (g_status == 0)
-            inputline_execute(inputLine->next);
-        break;
-    case OR:
-        if (g_status != 0)
-            inputline_execute(inputLine->next);
-        break;
-    case SEMICOLON:
-        inputline_execute(inputLine->next);
-        break;
-    case NONE:
-        break;
-    }
+        chain_execute(inputLine->chain, sep);
+    if (inputLine->next != NULL)
+        inputline_execute(inputLine->next, inputLine->sep);
 }

@@ -3,6 +3,7 @@
 
 #include "builtin.h"
 #include "pipeline.h"
+#include "inputline.h"
 #include "redirections.h"
 
 /**
@@ -18,6 +19,6 @@ typedef struct Chain {
 Chain *chain_create();
 void chain_destroy(Chain **chain);
 void chain_print(Chain *chain, int depth);
-void chain_execute(Chain *chain);
+void chain_execute(Chain *chain, enum InputLineSep sep);
 
 #endif // CHAIN_H

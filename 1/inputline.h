@@ -1,8 +1,6 @@
 #ifndef INPUTLINE_H
 #define INPUTLINE_H
 
-#include "chain.h"
-
 enum InputLineSep {
     BACKGROUND,
     AND,
@@ -10,6 +8,8 @@ enum InputLineSep {
     SEMICOLON,
     NONE
 };
+
+struct Chain;
 
 /**
  * <inputline> ::= <chain> & <inputline>
@@ -20,7 +20,7 @@ enum InputLineSep {
  *              | <empty>
  */
 typedef struct InputLine {
-    Chain *chain;
+    struct Chain *chain;
     enum InputLineSep sep;
     struct InputLine *next;
 } InputLine;
@@ -28,6 +28,6 @@ typedef struct InputLine {
 InputLine *inputline_create();
 void inputline_destroy(InputLine **inputLine);
 void inputline_print(InputLine *inputLine, int depth);
-void inputline_execute(InputLine *inputLine);
+void inputline_execute(InputLine *inputLine, enum InputLineSep sep);
 
 #endif // INPUTLINE_H

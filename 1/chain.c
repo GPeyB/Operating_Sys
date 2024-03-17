@@ -3,8 +3,10 @@
 
 #include "chain.h"
 #include "command.h"
+#include "inputline.h"
 #include "pipeline.h"
 #include "redirections.h"
+#include "shared.h"
 #include "util.h"
 
 Chain *chain_create() {
@@ -38,7 +40,11 @@ void chain_print(Chain *chain, int depth) {
         builtin_print(chain->builtIn, depth);
 }
 
-void chain_execute(Chain *chain) {
+void chain_execute(Chain *chain, enum InputLineSep sep) {
+    // check if we can skip running this command
+    if ((sep == AND && g_status == 1) || (sep == OR && g_status == 0))
+        return;
+    
     if (chain->builtIn != NULL) {
         builtin_execute(chain->builtIn);
     } else if (chain->pipeline != NULL) {
