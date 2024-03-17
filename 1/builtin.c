@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "builtin.h"
 #include "options.h"
@@ -39,7 +40,17 @@ void builtin_execute(BuiltIn *builtIn) {
         g_exitShell = true;
     } else if (strcmp(builtIn->name, "status") == 0) {
         printf("The most recent exit code is: %d\n", g_status);
-    } else if (strcmp(builtIn->name, "error") == 0) {
-        g_status = 1;
+    } else if (strcmp(builtIn->name, "cd") == 0) {
+        if (builtIn->options->size > 0) {
+            if (chdir(builtIn->options->options[0]) != 0) {
+                fprintf(stderr, "cd: %s: No such file or directory\n", builtIn->options->options[0]);
+                g_status = 1;
+            } else {
+                g_status = 0;
+            }
+        } else {
+            fprintf(stderr, "cd: missing argument\n");
+            g_status = 1;
+        }
     }
 }

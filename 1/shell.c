@@ -26,7 +26,7 @@ char *OPERATORS[] = {
 char *BUILTINS[] = {
     "exit",
     "status",
-    "error",
+    "cd",
     NULL
 };
 
