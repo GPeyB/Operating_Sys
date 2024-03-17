@@ -45,7 +45,9 @@ void childProcess(Command *command) {
 }
 
 void parentProcess(pid_t childPid) {
-    waitpid(childPid, &g_status, 0);
+    int status = 0;
+    waitpid(childPid, &status, 0);
+    g_status = WEXITSTATUS(status);
 }
 
 void command_execute(Command *command) {
