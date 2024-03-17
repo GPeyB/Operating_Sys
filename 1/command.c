@@ -41,7 +41,10 @@ void childProcess(Command *command) {
     // options are NULL-terminated
     options_append(command->options, NULL);
 
-    execvp(command->name, command->options->options);
+    if (execvp(command->name, command->options->options) == -1) {
+        fprintf(stderr, "Error: command not found!\n");
+        g_status = 127;
+    }
 }
 
 void parentProcess(pid_t childPid) {
