@@ -27,13 +27,9 @@ int main(int argc, char *argv[]) {
         InputLine *line = NULL;
         bool parsedSuccessfully = parseInputLine(&line, &tokenList);
         if (tokenList == NULL && parsedSuccessfully) {
-            printf("Parsed successfully!\n");
-            inputline_print(line, 0);
             inputline_execute(line);
-            printf("Exit status: %d\n", g_status);
         } else {
             printf("Error: invalid syntax!\n");
-            inputline_print(line, 0);
         }
 
         inputline_destroy(&line);

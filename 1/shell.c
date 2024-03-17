@@ -52,11 +52,9 @@ bool acceptOptions(Options **options, List *tokens) {
     Options *o = *options;
 
     while (*tokens != NULL && !isOperator((*tokens)->t)) {
-        o->options[o->nrOptions++] = (*tokens)->t;
+        options_append(o, (*tokens)->t);
         (*tokens) = (*tokens)->next;
     }
-    if (o->nrOptions == 0)
-        options_destroy(options);
     return true;
 }
 

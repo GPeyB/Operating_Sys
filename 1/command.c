@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "command.h"
 #include "options.h"
@@ -32,8 +35,29 @@ void command_print(Command *command, int depth) {
         options_print(command->options, depth);
 }
 
+void childProcess(Command *command) {
+    // first argument is the command name
+    options_insert(command->options, command->name, 0);
+    // options are NULL-terminated
+    options_append(command->options, NULL);
+
+    execvp(command->name, command->options->options);
+}
+
+void parentProcess(pid_t childPid) {
+    waitpid(childPid, &g_status, 0);
+}
+
 void command_execute(Command *command) {
-    printf("Executing command: %s\n", command->name);
-    // TODO: Implement command execution
-    g_status = 0;
+    pid_t pid;
+    pid = fork();
+    if (pid < 0) {
+        fprintf(stderr, "fork() failed\n");
+    } else if (pid == 0) {
+        // only child process gets here
+        childProcess(command);
+    } else {
+        // only parent process gets here
+        parentProcess(pid);
+    }
 }
