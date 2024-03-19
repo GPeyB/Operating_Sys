@@ -12,6 +12,6 @@ typedef struct Command {
 Command *command_create();
 void command_destroy(Command **command);
 void command_print(Command *command, int depth);
-void command_execute(Command *command, pid_t *pid);
+void command_execute(Command *command, pid_t *pid, int fdIn, int fdOut);
 
 #endif // COMMAND_H

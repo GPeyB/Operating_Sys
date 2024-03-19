@@ -1,11 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 #include "command.h"
 #include "pipeline.h"
 #include "shared.h"
 #include "util.h"
+
+#define READ_END 0
+#define WRITE_END 1
 
 Pipeline *pipeline_create() {
     Pipeline *pipeline = (Pipeline *)malloc(sizeof(Pipeline));
@@ -33,14 +37,21 @@ void pipeline_print(Pipeline *pipeline, int depth) {
         pipeline_print(pipeline->pipeline, depth);
 }
 
-void pipeline_execute(Pipeline *pipeline) {
+void pipeline_execute(Pipeline *pipeline, int fdIn) {
     pid_t pid;
-    command_execute(pipeline->command, &pid);
     if (pipeline->pipeline != NULL) {
-        pipeline_execute(pipeline->pipeline);
+        // there is a next command, create pipe to connect current and next
+        int pipefd[2];
+        if (pipe(pipefd) == -1) {
+            perror("pipe");
+            return;
+        }
+
+        command_execute(pipeline->command, &pid, fdIn, pipefd[WRITE_END]);
+        pipeline_execute(pipeline->pipeline, pipefd[READ_END]);
     } else {
-        // the command run above is the last command in the pipeline
-        // get its status and set it as the global status
+        // this was the last command in the pipeline
+        command_execute(pipeline->command, &pid, fdIn, STDOUT_FILENO);
         int status = 0;
         waitpid(pid, &status, 0);
         g_status = WEXITSTATUS(status);

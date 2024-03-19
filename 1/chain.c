@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "chain.h"
 #include "command.h"
@@ -44,10 +45,10 @@ void chain_execute(Chain *chain, enum InputLineSep sep) {
     // check if we can skip running this command
     if ((sep == AND && g_status == 1) || (sep == OR && g_status == 0))
         return;
-    
+
     if (chain->builtIn != NULL) {
         builtin_execute(chain->builtIn);
     } else if (chain->pipeline != NULL) {
-        pipeline_execute(chain->pipeline);
+        pipeline_execute(chain->pipeline, STDIN_FILENO);
     }
 }

@@ -42,27 +42,30 @@ void execCommand(Command *command) {
     options_append(command->options, NULL);
 
     if (execvp(command->name, command->options->options) == -1) {
-        fprintf(stdout, "Error: command not found!\n");
-        g_status = 127;
+        printf("Error: command not found!\n");
+        exit(127);
     }
 }
 
-void waitForChild(pid_t childPid) {
-    int status = 0;
-    waitpid(childPid, &status, 0);
-    g_status = WEXITSTATUS(status);
-}
-
-void command_execute(Command *command, pid_t *pid) {
+void command_execute(Command *command, pid_t *pid, int fdIn, int fdOut) {
     pid_t localPid = fork();
+    
     if (localPid < 0) {
-        fprintf(stderr, "fork() failed\n");
-    } else if (localPid == 0) {
+        perror("fork");
+        return;
+    }
+    
+    if (localPid == 0) {
         // only child process gets here
+        dup2(fdIn, STDIN_FILENO); // replace stdin with the read end of the pipe
+        dup2(fdOut, STDOUT_FILENO); // replace stdout with the write end of the pipe
+        
         execCommand(command);
+        
+        close(fdIn);
+        close(fdOut);
     } else {
         // only parent process gets here
-        //waitForChild(pid);
         *pid = localPid;
     }
 }
