@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/wait.h>
 
 #include "command.h"
 #include "pipeline.h"
+#include "shared.h"
 #include "util.h"
 
 Pipeline *pipeline_create() {
@@ -32,9 +34,17 @@ void pipeline_print(Pipeline *pipeline, int depth) {
 }
 
 void pipeline_execute(Pipeline *pipeline) {
-    if (pipeline->command != NULL) {
-        command_execute(pipeline->command);
-    } else if (pipeline->pipeline != NULL) {
+    pid_t pid;
+    command_execute(pipeline->command, &pid);
+    if (pipeline->pipeline != NULL) {
         pipeline_execute(pipeline->pipeline);
+    } else {
+        // the command run above is the last command in the pipeline
+        // get its status and set it as the global status
+        int status = 0;
+        waitpid(pid, &status, 0);
+        g_status = WEXITSTATUS(status);
+        return;
     }
+    waitpid(pid, NULL, 0);
 }

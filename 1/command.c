@@ -35,34 +35,34 @@ void command_print(Command *command, int depth) {
         options_print(command->options, depth);
 }
 
-void childProcess(Command *command) {
+void execCommand(Command *command) {
     // first argument is the command name
     options_insert(command->options, command->name, 0);
     // options are NULL-terminated
     options_append(command->options, NULL);
 
     if (execvp(command->name, command->options->options) == -1) {
-        fprintf(stderr, "Error: command not found!\n");
+        fprintf(stdout, "Error: command not found!\n");
         g_status = 127;
     }
 }
 
-void parentProcess(pid_t childPid) {
+void waitForChild(pid_t childPid) {
     int status = 0;
     waitpid(childPid, &status, 0);
     g_status = WEXITSTATUS(status);
 }
 
-void command_execute(Command *command) {
-    pid_t pid;
-    pid = fork();
-    if (pid < 0) {
+void command_execute(Command *command, pid_t *pid) {
+    pid_t localPid = fork();
+    if (localPid < 0) {
         fprintf(stderr, "fork() failed\n");
-    } else if (pid == 0) {
+    } else if (localPid == 0) {
         // only child process gets here
-        childProcess(command);
+        execCommand(command);
     } else {
         // only parent process gets here
-        parentProcess(pid);
+        //waitForChild(pid);
+        *pid = localPid;
     }
 }
