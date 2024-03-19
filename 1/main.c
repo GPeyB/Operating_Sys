@@ -33,6 +33,8 @@ int main(int argc, char *argv[]) {
 #endif // BONUS
 
         inputLine = readInputLine();
+        if (inputLine == NULL)
+            break;
         tokenList = getTokenList(inputLine);
         // copy token list pointer to avoid losing the original pointer
         List tokenListCopy = tokenList;

@@ -1,11 +1,12 @@
+#include <assert.h>
+#include <ctype.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include <assert.h>
-#include <stdbool.h>
 
 #include "scanner.h"
+#include "shared.h"
 
 /**
  * Reads an inputline from stdin.
@@ -21,6 +22,11 @@ char *readInputLine() {
 
     bool quoteStarted = false;
     while (c != '\n' || quoteStarted) { // Ensure that newlines in strings are accepted
+        if (c == EOF) {
+            putchar('\n');
+            free(s);
+            return NULL;
+        }
         if (c == '\"') {
             quoteStarted = !quoteStarted;
         }
@@ -171,7 +177,8 @@ bool isEmpty(List l) {
  * @param li the input list to be printed.
  */
 void printList(List li) {
-    if (li == NULL) return;
+    if (li == NULL)
+        return;
     printf("\"%s\"", li->t);
     li = li->next;
     while (li != NULL) {
