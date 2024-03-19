@@ -43,14 +43,14 @@ void builtin_execute(BuiltIn *builtIn) {
     } else if (strcmp(builtIn->name, "cd") == 0) {
         if (builtIn->options->size > 0) {
             if (chdir(builtIn->options->options[0]) != 0) {
-                fprintf(stderr, "cd: %s: No such file or directory\n", builtIn->options->options[0]);
-                g_status = 1;
+                printf("Error: cd directory not found!\n");
+                g_status = 2;
             } else {
                 g_status = 0;
             }
         } else {
-            fprintf(stderr, "cd: missing argument\n");
-            g_status = 1;
+            printf("Error: cd requires folder to navigate to!\n");
+            g_status = 2;
         }
     }
 }
