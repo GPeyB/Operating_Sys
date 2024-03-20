@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -51,8 +52,13 @@ void chain_execute(Chain *chain, enum InputLineSep sep) {
     } else if (chain->pipeline != NULL) {
         int infd = STDIN_FILENO;
         int outfd = STDOUT_FILENO;
-        if (chain->redirections != NULL)
-            redirections_execute(chain->redirections, &infd, &outfd);
+        if (chain->redirections != NULL) {
+            bool executedSuccessfully = redirections_execute(chain->redirections, &infd, &outfd);
+            if (!executedSuccessfully) {
+                g_status = 1;
+                return;
+            }
+        }
         pipeline_execute(chain->pipeline, NULL, &infd, &outfd);
     }
 }

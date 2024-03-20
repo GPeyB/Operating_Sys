@@ -1,4 +1,5 @@
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,25 +38,26 @@ void redirections_print(Redirections *redirections, int depth) {
     }
 }
 
-void redirections_execute(Redirections *redirections, int *infd, int *outfd) {
+bool redirections_execute(Redirections *redirections, int *infd, int *outfd) {
     if (redirections->input != NULL && redirections->output != NULL
         && strcmp(redirections->input, redirections->output) == 0) {
         printf("Error: input and output files cannot be equal!\n");
-        return;
+        return false;
     }
 
     if (redirections->input != NULL) {
         *infd = open(redirections->input, O_RDONLY);
         if (*infd == -1) {
             perror("open");
-            return;
+            return false;
         }
     }
     if (redirections->output != NULL) {
         *outfd = open(redirections->output, O_CREAT | O_WRONLY | O_TRUNC, OPEN_PERMISSIONS);
         if (*outfd == -1) {
             perror("open");
-            return;
+            return false;
         }
     }
+    return true;
 }
