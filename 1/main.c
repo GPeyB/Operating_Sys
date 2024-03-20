@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     List tokenList;
 
     while (!g_exitShell) {
-#ifdef BONUS
+#if BONUS
         // custom prompt
         char cwd[1024];
         if (getcwd(cwd, sizeof(cwd)) != NULL) {
