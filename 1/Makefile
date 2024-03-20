@@ -13,3 +13,4 @@ clean:
 	rm -f *~
 	rm -f *.o
 	rm -f shell
+	rm -f test
