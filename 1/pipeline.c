@@ -8,9 +8,6 @@
 #include "shared.h"
 #include "util.h"
 
-#define READ_END 0
-#define WRITE_END 1
-
 Pipeline *pipeline_create() {
     Pipeline *pipeline = (Pipeline *)malloc(sizeof(Pipeline));
     pipeline->command = NULL;
@@ -37,7 +34,7 @@ void pipeline_print(Pipeline *pipeline, int depth) {
         pipeline_print(pipeline->pipeline, depth);
 }
 
-void pipeline_execute(Pipeline *pipeline, int fdIn) {
+void pipeline_execute(Pipeline *pipeline, int *prevfd) {
     pid_t pid;
     if (pipeline->pipeline != NULL) {
         // there is a next command, create pipe to connect current and next
@@ -47,11 +44,11 @@ void pipeline_execute(Pipeline *pipeline, int fdIn) {
             return;
         }
 
-        command_execute(pipeline->command, &pid, fdIn, pipefd[WRITE_END]);
-        pipeline_execute(pipeline->pipeline, pipefd[READ_END]);
+        command_execute(pipeline->command, &pid, prevfd, pipefd);
+        pipeline_execute(pipeline->pipeline, pipefd);
     } else {
         // this was the last command in the pipeline
-        command_execute(pipeline->command, &pid, fdIn, STDOUT_FILENO);
+        command_execute(pipeline->command, &pid, prevfd, NULL);
         int status = 0;
         waitpid(pid, &status, 0);
         g_status = WEXITSTATUS(status);

@@ -9,6 +9,9 @@
 #include "shared.h"
 #include "util.h"
 
+#define READ_END 0
+#define WRITE_END 1
+
 Command *command_create() {
     Command *command = (Command *)malloc(sizeof(Command));
     command->name = NULL;
@@ -47,25 +50,34 @@ void execCommand(Command *command) {
     }
 }
 
-void command_execute(Command *command, pid_t *pid, int fdIn, int fdOut) {
-    pid_t localPid = fork();
+void command_execute(Command *command, pid_t *pid, int *prevfd, int *fd) {
+    *pid = fork();
     
-    if (localPid < 0) {
+    if (*pid < 0) {
         perror("fork");
         return;
     }
     
-    if (localPid == 0) {
+    if (*pid == 0) {
         // only child process gets here
-        dup2(fdIn, STDIN_FILENO); // replace stdin with the read end of the pipe
-        dup2(fdOut, STDOUT_FILENO); // replace stdout with the write end of the pipe
-        
+        if (prevfd != NULL) {
+            // there is a previous command, connect to its output
+            close(prevfd[WRITE_END]);
+            dup2(prevfd[READ_END], STDIN_FILENO);
+            close(prevfd[READ_END]);
+        }
+        if (fd != NULL) {
+            // there is a next command, connect to its input
+            close(fd[READ_END]);
+            dup2(fd[WRITE_END], STDOUT_FILENO);
+            close(fd[WRITE_END]);
+        }
         execCommand(command);
-        
-        close(fdIn);
-        close(fdOut);
     } else {
         // only parent process gets here
-        *pid = localPid;
+        if (prevfd != NULL) {
+            close(prevfd[READ_END]);
+            close(prevfd[WRITE_END]);
+        }
     }
 }
