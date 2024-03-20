@@ -49,6 +49,10 @@ void chain_execute(Chain *chain, enum InputLineSep sep) {
     if (chain->builtIn != NULL) {
         builtin_execute(chain->builtIn);
     } else if (chain->pipeline != NULL) {
-        pipeline_execute(chain->pipeline, STDIN_FILENO);
+        int infd = STDIN_FILENO;
+        int outfd = STDOUT_FILENO;
+        if (chain->redirections != NULL)
+            redirections_execute(chain->redirections, &infd, &outfd);
+        pipeline_execute(chain->pipeline, NULL, &infd, &outfd);
     }
 }

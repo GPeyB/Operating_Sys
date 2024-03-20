@@ -2,15 +2,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "inputline.h"
-#include "scanner.h"
-#include "shell.h"
-#include "options.h"
-#include "pipeline.h"
-#include "redirections.h"
 #include "builtin.h"
 #include "chain.h"
 #include "command.h"
+#include "inputline.h"
+#include "options.h"
+#include "pipeline.h"
+#include "redirections.h"
+#include "scanner.h"
+#include "shell.h"
 
 char *OPERATORS[] = {
     "&",
@@ -124,11 +124,13 @@ bool parseRedirections(Redirections **redirections, List *tokens) {
             return false;
         if (acceptToken(tokens, ">"))
             return parseFileName(&r->output, tokens);
+        return true;
     } else if (acceptToken(tokens, ">")) {
         if (!parseFileName(&r->output, tokens))
             return false;
         if (acceptToken(tokens, "<"))
             return parseFileName(&r->input, tokens);
+        return true;
     }
 
     redirections_destroy(redirections);

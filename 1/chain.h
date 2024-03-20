@@ -2,8 +2,8 @@
 #define CHAIN_H
 
 #include "builtin.h"
-#include "pipeline.h"
 #include "inputline.h"
+#include "pipeline.h"
 #include "redirections.h"
 
 /**

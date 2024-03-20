@@ -1,8 +1,12 @@
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "redirections.h"
 #include "util.h"
+
+#define OPEN_PERMISSIONS 0644
 
 Redirections *redirections_create() {
     Redirections *redirections = (Redirections *)malloc(sizeof(Redirections));
@@ -30,5 +34,28 @@ void redirections_print(Redirections *redirections, int depth) {
     if (redirections->output != NULL) {
         printDepth(depth);
         printf("output: %s\n", redirections->output);
+    }
+}
+
+void redirections_execute(Redirections *redirections, int *infd, int *outfd) {
+    if (redirections->input != NULL && redirections->output != NULL
+        && strcmp(redirections->input, redirections->output) == 0) {
+        printf("Error: input and output files cannot be equal!\n");
+        return;
+    }
+
+    if (redirections->input != NULL) {
+        *infd = open(redirections->input, O_RDONLY);
+        if (*infd == -1) {
+            perror("open");
+            return;
+        }
+    }
+    if (redirections->output != NULL) {
+        *outfd = open(redirections->output, O_CREAT | O_WRONLY | O_TRUNC, OPEN_PERMISSIONS);
+        if (*outfd == -1) {
+            perror("open");
+            return;
+        }
     }
 }

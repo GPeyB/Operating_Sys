@@ -50,34 +50,46 @@ void execCommand(Command *command) {
     }
 }
 
-void command_execute(Command *command, pid_t *pid, int *prevfd, int *fd) {
+void command_execute(Command *command, pid_t *pid, int *prevPipe, int *pipe, int *infd, int *outfd) {
     *pid = fork();
-    
+
     if (*pid < 0) {
         perror("fork");
         return;
     }
-    
+
     if (*pid == 0) {
         // only child process gets here
-        if (prevfd != NULL) {
+        if (prevPipe != NULL) {
             // there is a previous command, connect to its output
-            close(prevfd[WRITE_END]);
-            dup2(prevfd[READ_END], STDIN_FILENO);
-            close(prevfd[READ_END]);
+            close(prevPipe[WRITE_END]);
+            dup2(prevPipe[READ_END], STDIN_FILENO);
+            close(prevPipe[READ_END]);
+        } else {
+            // no previous command, connect to the input file
+            if (*infd != STDIN_FILENO) {
+                dup2(*infd, STDIN_FILENO);
+                close(*infd);
+            }
         }
-        if (fd != NULL) {
+        if (pipe != NULL) {
             // there is a next command, connect to its input
-            close(fd[READ_END]);
-            dup2(fd[WRITE_END], STDOUT_FILENO);
-            close(fd[WRITE_END]);
+            close(pipe[READ_END]);
+            dup2(pipe[WRITE_END], STDOUT_FILENO);
+            close(pipe[WRITE_END]);
+        } else {
+            // no next command, connect to the output file
+            if (*outfd != STDOUT_FILENO) {
+                dup2(*outfd, STDOUT_FILENO);
+                close(*outfd);
+            }
         }
         execCommand(command);
     } else {
         // only parent process gets here
-        if (prevfd != NULL) {
-            close(prevfd[READ_END]);
-            close(prevfd[WRITE_END]);
+        if (prevPipe != NULL) {
+            close(prevPipe[READ_END]);
+            close(prevPipe[WRITE_END]);
         }
     }
 }

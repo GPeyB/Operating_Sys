@@ -1,3 +1,4 @@
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
@@ -5,6 +6,7 @@
 
 #include "command.h"
 #include "pipeline.h"
+#include "redirections.h"
 #include "shared.h"
 #include "util.h"
 
@@ -34,21 +36,21 @@ void pipeline_print(Pipeline *pipeline, int depth) {
         pipeline_print(pipeline->pipeline, depth);
 }
 
-void pipeline_execute(Pipeline *pipeline, int *prevfd) {
+void pipeline_execute(Pipeline *pipeline, int *prevPipe, int *infd, int *outfd) {
     pid_t pid;
     if (pipeline->pipeline != NULL) {
         // there is a next command, create pipe to connect current and next
-        int pipefd[2];
-        if (pipe(pipefd) == -1) {
+        int currPipe[2];
+        if (pipe(currPipe) == -1) {
             perror("pipe");
             return;
         }
 
-        command_execute(pipeline->command, &pid, prevfd, pipefd);
-        pipeline_execute(pipeline->pipeline, pipefd);
+        command_execute(pipeline->command, &pid, prevPipe, currPipe, infd, outfd);
+        pipeline_execute(pipeline->pipeline, currPipe, infd, outfd);
     } else {
         // this was the last command in the pipeline
-        command_execute(pipeline->command, &pid, prevfd, NULL);
+        command_execute(pipeline->command, &pid, prevPipe, NULL, infd, outfd);
         int status = 0;
         waitpid(pid, &status, 0);
         g_status = WEXITSTATUS(status);
