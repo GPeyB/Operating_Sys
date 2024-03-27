@@ -53,9 +53,9 @@ void inputline_print(InputLine *inputLine, int depth) {
         inputline_print(inputLine->next, depth);
 }
 
-void inputline_execute(InputLine *inputLine, enum InputLineSep sep) {
+void inputline_execute(InputLine *inputLine) {
     if (inputLine->chain != NULL)
-        chain_execute(inputLine->chain, sep);
+        chain_execute(inputLine->chain, inputLine->sep);
     if (inputLine->next != NULL)
-        inputline_execute(inputLine->next, inputLine->sep);
+        inputline_execute(inputLine->next);
 }

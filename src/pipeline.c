@@ -36,7 +36,7 @@ void pipeline_print(Pipeline *pipeline, int depth) {
         pipeline_print(pipeline->pipeline, depth);
 }
 
-void pipeline_execute(Pipeline *pipeline, int *prevPipe, int *infd, int *outfd) {
+void pipeline_execute(Pipeline *pipeline, int *prevPipe, int *infd, int *outfd, bool isBackground) {
     pid_t pid;
     if (pipeline->pipeline != NULL) {
         // there is a next command, create pipe to connect current and next
@@ -47,14 +47,16 @@ void pipeline_execute(Pipeline *pipeline, int *prevPipe, int *infd, int *outfd) 
         }
 
         command_execute(pipeline->command, &pid, prevPipe, currPipe, infd, outfd);
-        pipeline_execute(pipeline->pipeline, currPipe, infd, outfd);
+        pipeline_execute(pipeline->pipeline, currPipe, infd, outfd, isBackground);
+        if (!isBackground)
+            waitpid(pid, NULL, 0);
     } else {
         // this was the last command in the pipeline
         command_execute(pipeline->command, &pid, prevPipe, NULL, infd, outfd);
+        if (isBackground)
+            return; // don't wait for background processes
         int status = 0;
         waitpid(pid, &status, 0);
         g_status = WEXITSTATUS(status);
-        return;
     }
-    waitpid(pid, NULL, 0);
 }

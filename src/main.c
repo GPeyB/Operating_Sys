@@ -6,12 +6,14 @@
 #include "inputline.h"
 #include "scanner.h"
 #include "shell.h"
+#include "processlist.h"
 
 #define BLUE "\033[1;34m"
 #define RESET "\033[0m"
 
 bool g_exitShell = false;
 int g_status = 0;
+ProcessList g_processList = NULL;
 
 int main(int argc, char *argv[]) {
     setbuf(stdin, NULL);
@@ -19,6 +21,7 @@ int main(int argc, char *argv[]) {
 
     char *inputLine;
     List tokenList;
+    g_processList = processlist_create();
 
     while (!g_exitShell) {
 #if BONUS
@@ -42,8 +45,8 @@ int main(int argc, char *argv[]) {
         InputLine *line = NULL;
         bool parsedSuccessfully = parseInputLine(&line, &tokenList);
         if (tokenList == NULL && parsedSuccessfully) {
-            //inputline_print(line, 0);
-            inputline_execute(line, NONE);
+            inputline_print(line, 0);
+            inputline_execute(line);
         } else {
             printf("Error: invalid syntax!\n");
         }
