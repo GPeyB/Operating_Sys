@@ -59,6 +59,7 @@ void chain_execute(Chain *chain, enum InputLineSep sep) {
                 return;
             }
         }
-        pipeline_execute(chain->pipeline, NULL, &infd, &outfd);
+        bool isBackground = sep == BACKGROUND;
+        pipeline_execute(chain->pipeline, NULL, &infd, &outfd, isBackground);
     }
 }

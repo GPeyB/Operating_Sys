@@ -2,6 +2,7 @@
 #define PIPELINE_H
 
 #include "command.h"
+#include <stdbool.h>
 
 /**
  * <pipeline> ::= <command> "|" <pipeline>
@@ -15,6 +16,6 @@ typedef struct Pipeline {
 Pipeline *pipeline_create();
 void pipeline_destroy(Pipeline **pipeline);
 void pipeline_print(Pipeline *pipeline, int depth);
-void pipeline_execute(Pipeline *pipeline, int *prevfd, int *infd, int *outfd);
+void pipeline_execute(Pipeline *pipeline, int *prevfd, int *infd, int *outfd, bool isBackground);
 
 #endif // PIPELINE_H
