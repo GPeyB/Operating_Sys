@@ -13,7 +13,7 @@
 
 bool g_exitShell = false;
 int g_status = 0;
-ProcessList g_processList = NULL;
+ProcessList *g_processList = NULL;
 
 int main(int argc, char *argv[]) {
     setbuf(stdin, NULL);
