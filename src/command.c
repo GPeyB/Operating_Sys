@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -49,6 +50,11 @@ void execCommand(Command *command) {
     }
 }
 
+// child process signal handler
+static void sigchld_handler(int signum) {
+    puts("got SIGCHLD");
+}
+
 void command_execute(Command *command, pid_t *pid, int *prevPipe, int *pipe, int *infd, int *outfd) {
     *pid = fork();
 
@@ -86,6 +92,15 @@ void command_execute(Command *command, pid_t *pid, int *prevPipe, int *pipe, int
         execCommand(command);
     } else {
         // only parent process gets here
+
+        // register signal handler for child process
+        struct sigaction sa;
+        sa.sa_handler = sigchld_handler;
+        if (sigaction(SIGCHLD, sa, NULL) == -1) {
+            perror("sigaction");
+            return;
+        }
+
         if (prevPipe != NULL) {
             close(prevPipe[READ_END]);
             close(prevPipe[WRITE_END]);
