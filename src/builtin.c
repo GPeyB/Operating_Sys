@@ -36,6 +36,13 @@ void builtin_print(BuiltIn *builtIn, int depth) {
 
 void builtin_execute(BuiltIn *builtIn) {
     if (strcmp(builtIn->name, "exit") == 0) {
+        // if there are any processes running, print warning and return 2
+        if (processlist_size(g_processList) > 0) {
+            printf("Error: there are still background processes running!\n");
+            g_status = 2;
+            return;
+        }
+        
         g_status = 0;
         g_exitShell = true;
     } else if (strcmp(builtIn->name, "status") == 0) {

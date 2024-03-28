@@ -53,10 +53,15 @@ void pipeline_execute(Pipeline *pipeline, int *prevPipe, int *infd, int *outfd, 
     } else {
         // this was the last command in the pipeline
         command_execute(pipeline->command, &pid, prevPipe, NULL, infd, outfd);
-        if (isBackground)
-            return; // don't wait for background processes
-        int status = 0;
-        waitpid(pid, &status, 0);
-        g_status = WEXITSTATUS(status);
+        if (isBackground) {
+            // add process to process list
+            processlist_add(g_processList, pid);
+            g_status = 0;
+        } else {
+            // wait for the last command to finish
+            int status = 0;
+            waitpid(pid, &status, 0);
+            g_status = WEXITSTATUS(status);
+        }
     }
 }

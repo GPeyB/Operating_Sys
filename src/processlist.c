@@ -1,6 +1,7 @@
 #include "processlist.h"
 
-#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 ProcessList *processlist_create() {
     ProcessList *list = (ProcessList *)malloc(sizeof(ProcessList));
@@ -16,6 +17,16 @@ void processlist_destroy(ProcessList *list) {
         free(current);
         current = next;
     }
+}
+
+int processlist_size(ProcessList *list) {
+    int size = 0;
+    ProcessList *current = list;
+    while (current->next != NULL) {
+        current = current->next;
+        size++;
+    }
+    return size;
 }
 
 void processlist_add(ProcessList *list, int pid) {

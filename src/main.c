@@ -4,9 +4,9 @@
 #include <unistd.h>
 
 #include "inputline.h"
+#include "processlist.h"
 #include "scanner.h"
 #include "shell.h"
-#include "processlist.h"
 
 #define BLUE "\033[1;34m"
 #define RESET "\033[0m"
@@ -16,12 +16,13 @@ int g_status = 0;
 ProcessList *g_processList = NULL;
 
 int main(int argc, char *argv[]) {
+    g_processList = processlist_create();
+
     setbuf(stdin, NULL);
     setbuf(stdout, NULL);
 
     char *inputLine;
     List tokenList;
-    g_processList = processlist_create();
 
     while (!g_exitShell) {
 #if BONUS
@@ -55,6 +56,8 @@ int main(int argc, char *argv[]) {
         freeTokenList(tokenListCopy);
         free(inputLine);
     }
+    
+    processlist_destroy(g_processList);
 
     return 0;
 }
