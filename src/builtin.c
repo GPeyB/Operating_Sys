@@ -42,7 +42,6 @@ void builtin_execute(BuiltIn *builtIn) {
             g_status = 2;
             return;
         }
-        
         g_status = 0;
         g_exitShell = true;
     } else if (strcmp(builtIn->name, "status") == 0) {
@@ -59,5 +58,7 @@ void builtin_execute(BuiltIn *builtIn) {
             printf("Error: cd requires folder to navigate to!\n");
             g_status = 2;
         }
+    } else if (strcmp(builtIn->name, "jobs") == 0) {
+        processlist_print(g_processList);
     }
 }

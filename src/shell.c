@@ -27,6 +27,7 @@ char *BUILTINS[] = {
     "exit",
     "status",
     "cd",
+    "jobs",
     NULL
 };
 
