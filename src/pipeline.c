@@ -51,11 +51,11 @@ void pipeline_execute(Pipeline *pipeline, int *prevPipe, int *infd, int *outfd, 
         if (!isBackground)
             waitpid(pid, NULL, 0);
     } else {
-        // this was the last command in the pipeline
+        // this is the last command in the pipeline
         command_execute(pipeline->command, &pid, prevPipe, NULL, infd, outfd);
         if (isBackground) {
             // add process to process list
-            Process *process = process_create(pid);
+            Process *process = process_create(pid, pipeline->command->name);
             processlist_add(g_processList, process);
             g_status = 0;
         } else {

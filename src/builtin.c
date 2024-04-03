@@ -38,7 +38,7 @@ void builtin_print(BuiltIn *builtIn, int depth) {
 }
 
 static void execExit() {
-    if (processlist_size(g_processList) > 0) {
+    if (g_processList->size > 0) {
         printf("Error: there are still background processes running!\n");
         g_status = 2;
         return;
