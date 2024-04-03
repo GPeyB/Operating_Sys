@@ -1,0 +1,4 @@
+cat /etc/os-release > ./tempFile
+chmod 777 ./tempFile
+cat ./tempFile
+exit
