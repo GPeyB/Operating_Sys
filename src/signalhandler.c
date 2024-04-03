@@ -7,14 +7,13 @@
 extern ProcessList *g_processList;
 
 static void sigchld_handler(int signum, siginfo_t *info, void *context) {
-    printf("Signal %d received from process with PID %d\n", signum, info->si_pid);
-    // processlist_remove(g_processList);
+    processlist_remove(g_processList, info->si_pid);
 }
 
 void registerSignalHandler() {
     struct sigaction sa;
     sa.sa_sigaction = sigchld_handler;
-    sa.sa_flags = SA_SIGINFO;
+    sa.sa_flags = SA_SIGINFO | SA_RESTART; // SIGINFO to get PID, RESTART for getc
     if (sigaction(SIGCHLD, &sa, NULL) == -1) {
         perror("sigaction");
         return;

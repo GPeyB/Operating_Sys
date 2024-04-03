@@ -5,7 +5,7 @@
 
 ProcessList *processlist_create() {
     ProcessList *list = (ProcessList *)malloc(sizeof(ProcessList));
-    list->pid = -1;
+    list->process = NULL;
     list->next = NULL;
     return list;
 }
@@ -29,20 +29,20 @@ int processlist_size(ProcessList *list) {
     return size;
 }
 
-void processlist_add(ProcessList *list, int pid) {
+void processlist_add(ProcessList *list, Process *process) {
     ProcessList *current = list;
     while (current->next != NULL) {
         current = current->next;
     }
     current->next = (ProcessList *)malloc(sizeof(ProcessList));
-    current->next->pid = pid;
+    current->next->process = process;
     current->next->next = NULL;
 }
 
 void processlist_remove(ProcessList *list, int pid) {
     ProcessList *current = list;
     while (current->next != NULL) {
-        if (current->next->pid == pid) {
+        if (current->next->process->pid == pid) {
             ProcessList *next = current->next->next;
             free(current->next);
             current->next = next;
@@ -52,10 +52,21 @@ void processlist_remove(ProcessList *list, int pid) {
     }
 }
 
+static void print_recursive(ProcessList *list) {
+    if (list->next == NULL)
+        return;
+    print_recursive(list->next);
+    printf("Process running with index %d\n", list->next->process->idx);
+}
+
 void processlist_print(ProcessList *list) {
     ProcessList *current = list;
-    while (current->next != NULL) {
-        current = current->next;
-        printf("%d\n", current->pid);
+
+    if (current->next == NULL) {
+        printf("No background processes!\n");
+        return;
     }
+
+    // Recursive to easily print in reverse order
+    print_recursive(current);
 }

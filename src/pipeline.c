@@ -55,7 +55,8 @@ void pipeline_execute(Pipeline *pipeline, int *prevPipe, int *infd, int *outfd, 
         command_execute(pipeline->command, &pid, prevPipe, NULL, infd, outfd);
         if (isBackground) {
             // add process to process list
-            processlist_add(g_processList, pid);
+            Process *process = process_create(pid);
+            processlist_add(g_processList, process);
             g_status = 0;
         } else {
             // wait for the last command to finish

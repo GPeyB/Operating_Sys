@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
         InputLine *line = NULL;
         bool parsedSuccessfully = parseInputLine(&line, &tokenList);
         if (tokenList == NULL && parsedSuccessfully) {
-            inputline_print(line, 0);
+            //inputline_print(line, 0);
             inputline_execute(line);
         } else {
             printf("Error: invalid syntax!\n");
