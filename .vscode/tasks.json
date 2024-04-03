@@ -8,7 +8,7 @@
             "label": "build shell",
             "command": "make shell",
             "options": {
-                "cwd": "${workspaceFolder}/1"
+                "cwd": "${workspaceFolder}/src"
             },
             "group": {
                 "kind": "build",

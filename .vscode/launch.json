@@ -8,7 +8,7 @@
             "name": "debug shell",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/1/shell",
+            "program": "${workspaceFolder}/src/shell",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
