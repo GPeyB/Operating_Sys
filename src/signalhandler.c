@@ -3,14 +3,16 @@
 
 #include <signal.h>
 #include <stdio.h>
+#include <wait.h>
 
 extern ProcessList *g_processList;
 
 static void sigchld_handler(int signum, siginfo_t *info, void *context) {
     processlist_remove(g_processList, info->si_pid);
+    waitpid(info->si_pid, NULL, 0);
 }
 
-void registerSignalHandler() {
+static void registerSigchldHandler() {
     struct sigaction sa;
     sa.sa_sigaction = sigchld_handler;
     sa.sa_flags = SA_SIGINFO | SA_RESTART; // SIGINFO to get PID, RESTART for getc
@@ -18,4 +20,12 @@ void registerSignalHandler() {
         perror("sigaction");
         return;
     }
+}
+
+static void registerSigintHandler() {
+}
+
+void registerSignalHandlers() {
+    registerSigchldHandler();
+    registerSigintHandler();
 }

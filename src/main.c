@@ -21,7 +21,7 @@ ProcessList *g_processList = NULL;
 int main(int argc, char *argv[]) {
     g_processList = processlist_create();
 
-    registerSignalHandler();
+    registerSignalHandlers();
 
     setbuf(stdin, NULL);
     setbuf(stdout, NULL);
