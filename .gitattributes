@@ -1,0 +1,2 @@
+# Because we're working in WSL, all line endings are LF
+*   eol=lf
