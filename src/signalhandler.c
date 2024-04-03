@@ -16,7 +16,7 @@ static void sigchld_handler(int signum, siginfo_t *info, void *context) {
 }
 
 static void registerSigchldHandler() {
-    struct sigaction sa;
+    struct sigaction sa = {0};
     sa.sa_sigaction = sigchld_handler;
     sa.sa_flags = SA_SIGINFO | SA_RESTART; // SIGINFO to get PID, RESTART for getc to not quit on us
     if (sigaction(SIGCHLD, &sa, NULL) == -1) {
