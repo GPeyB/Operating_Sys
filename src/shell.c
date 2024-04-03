@@ -28,6 +28,7 @@ char *BUILTINS[] = {
     "status",
     "cd",
     "jobs",
+    "kill",
     NULL
 };
 

@@ -29,7 +29,21 @@ int processlist_size(ProcessList *list) {
     return size;
 }
 
+Process *processlist_get(ProcessList *list, int idx) {
+    ProcessList *current = list;
+    while (current->next != NULL) {
+        current = current->next;
+        if (current->process->idx == idx) {
+            return current->process;
+        }
+    }
+    return NULL;
+}
+
 void processlist_add(ProcessList *list, Process *process) {
+    if (process == NULL)
+        return;
+
     ProcessList *current = list;
     while (current->next != NULL) {
         current = current->next;
@@ -39,10 +53,13 @@ void processlist_add(ProcessList *list, Process *process) {
     current->next->next = NULL;
 }
 
-void processlist_remove(ProcessList *list, int pid) {
+void processlist_remove(ProcessList *list, Process *process) {
+    if (process == NULL)
+        return;
+
     ProcessList *current = list;
     while (current->next != NULL) {
-        if (current->next->process->pid == pid) {
+        if (current->next->process == process) {
             ProcessList *next = current->next->next;
             free(current->next);
             current->next = next;

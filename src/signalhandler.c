@@ -8,7 +8,8 @@
 extern ProcessList *g_processList;
 
 static void sigchld_handler(int signum, siginfo_t *info, void *context) {
-    processlist_remove(g_processList, info->si_pid);
+    Process *process = processlist_get(g_processList, info->si_pid);
+    processlist_remove(g_processList, process);
     waitpid(info->si_pid, NULL, 0);
 }
 
