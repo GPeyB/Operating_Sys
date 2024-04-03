@@ -7,7 +7,7 @@ shell: *.c *.h
 	gcc -std=c99 -Wall -pedantic $(SHELL_FILES) -o shell -g -DBONUS -D_POSIX_C_SOURCE
 
 test: test.c
-	gcc -std=c99 -Wall -pedantic test.c -o test -g
+	gcc -std=c99 -Wall -pedantic test.c -o test -g -D_POSIX_C_SOURCE
 
 clean:
 	rm -f *~

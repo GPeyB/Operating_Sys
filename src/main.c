@@ -7,9 +7,12 @@
 #include "processlist.h"
 #include "scanner.h"
 #include "shell.h"
+#include "signalhandler.h"
 
+#if BONUS
 #define BLUE "\033[1;34m"
 #define RESET "\033[0m"
+#endif // BONUS
 
 bool g_exitShell = false;
 int g_status = 0;
@@ -17,6 +20,8 @@ ProcessList *g_processList = NULL;
 
 int main(int argc, char *argv[]) {
     g_processList = processlist_create();
+
+    registerSignalHandler();
 
     setbuf(stdin, NULL);
     setbuf(stdout, NULL);
@@ -56,7 +61,7 @@ int main(int argc, char *argv[]) {
         freeTokenList(tokenListCopy);
         free(inputLine);
     }
-    
+
     processlist_destroy(g_processList);
 
     return 0;
