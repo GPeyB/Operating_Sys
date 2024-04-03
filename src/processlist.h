@@ -11,7 +11,8 @@ typedef struct ProcessList {
 
 ProcessList *processlist_create();
 void processlist_destroy(ProcessList *list);
-Process *processlist_get(ProcessList *list, int pid);
+Process *processlist_getByIdx(ProcessList *list, int idx);
+Process *processlist_getByPid(ProcessList *list, int pid);
 void processlist_add(ProcessList *list, Process *process);
 void processlist_remove(ProcessList *list, Process *process);
 void processlist_print(ProcessList *list);

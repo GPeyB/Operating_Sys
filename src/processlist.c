@@ -23,9 +23,15 @@ void processlist_destroy(ProcessList *list) {
     free(list);
 }
 
-Process *processlist_get(ProcessList *list, int pid) {
-    if (list == NULL)
-        return NULL;
+Process *processlist_getByIdx(ProcessList *list, int idx) {
+    for (int i = 0; i < list->size; i++) {
+        if (list->processes[i]->idx == idx)
+            return list->processes[i];
+    }
+    return NULL;
+}
+
+Process *processlist_getByPid(ProcessList *list, int pid) {
     for (int i = 0; i < list->size; i++) {
         if (list->processes[i]->pid == pid)
             return list->processes[i];

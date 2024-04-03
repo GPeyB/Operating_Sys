@@ -8,7 +8,7 @@
 extern ProcessList *g_processList;
 
 static void sigchld_handler(int signum, siginfo_t *info, void *context) {
-    Process *process = processlist_get(g_processList, info->si_pid);
+    Process *process = processlist_getByPid(g_processList, info->si_pid);
     if (process == NULL)
         return; // not a background process
     processlist_remove(g_processList, process);

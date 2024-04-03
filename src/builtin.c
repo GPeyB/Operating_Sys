@@ -104,7 +104,7 @@ static void execKill(Options *options) {
     }
 
     // Check if index is in list
-    Process *process = processlist_get(g_processList, idx);
+    Process *process = processlist_getByIdx(g_processList, idx);
     if (process == NULL) {
         printf("Error: this index is not a background process!\n");
         g_status = 2;
